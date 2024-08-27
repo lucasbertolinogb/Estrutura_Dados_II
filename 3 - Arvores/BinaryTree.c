@@ -1,178 +1,245 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct NoArvore
-{
-    int dado;
-    struct NoArvore *esquerda;
-    struct NoArvore *direita;
-};
+// NOME: LUCAS BERTOLINO SANTOS COSTA 
+// TURMA: CC6M 
+// MATÉRIA: Estrutua de dados II
 
-struct NoArvore *criarNo(int dado)
-{
-    struct NoArvore *novoNo = (struct NoArvore *)malloc(sizeof(struct NoArvore));
-    if (novoNo == NULL)
-    {
-        printf("Erro: Falha ao alocar memória para o novo nó.\n");
-        exit(-1);
-    }
-    novoNo->dado = dado;
-    novoNo->esquerda = NULL;
-    novoNo->direita = NULL;
-    return novoNo;
+//Atividade a ser feita =>
+/*• Crie em C a estrutura de uma árvore binária cuja 
+* informação seja um inteiro.
+*Escreva funções que recebam um ponteiro para a raiz da 
+* árvore AVL e façam:
+• Função de balanceamento;
+• Inserção de um elemento na árvore;
+• Pesquisa de um elemento na árvore;
+• Exclusão de um elemento na árvore.
+  */
+  
+
+// Criação da estrutura da árvore
+typedef struct Arvore {
+  struct Arvore *esquerda;
+  struct Arvore *direita;
+  int informacao;
+} arvore;
+
+// Verifica a altura da árvore
+int verificar_arvore_altura(arvore *arvore) {
+  // Se a árvore estiver vazia, retorna -1
+  int tamanho_esquerda = -1, tamanho_direita = -1;
+  if (arvore == NULL) // nao existe arvore
+    return printf("Arvore nula");
+
+  if (arvore->esquerda == NULL) {
+    // para de buscar altura
+  }    
+  else // caso existe mais uma altura a função percorre o caminho da esquerda
+  {
+    tamanho_esquerda = verificar_arvore_altura(arvore->esquerda);
+    
+  }
+
+  if (arvore->direita == NULL) {
+    // para de buscar altura
+  }    
+  else // caso existe mais uma altura a função percorre o caminho da direita
+  {
+    tamanho_direita = verificar_arvore_altura(arvore->direita);  
+  }
+
+  // se temos um tamanho arvore direita e esquerda 
+  // retornamos o maior valor, no caso, o 
+  // tamanho da arvore 
+  if (tamanho_esquerda > tamanho_direita)
+    return tamanho_esquerda++;
+  else
+    return tamanho_direita++;
+
+  // no final disso tudo deve retornar o tamanho da 
+  // arvore
 }
 
-struct NoArvore *inserir(struct NoArvore *raiz, int dado)
-{
-    if (raiz == NULL)
-    {
-        raiz = criarNo(dado);
-    }
+// Criação da árvore
+arvore  *criar_arvore(int informacao) {
+  // Aqui teremos o ponteiro para a raiz da árvore, ou
+  // seja, o primeiro elemento da árvore
+  arvore *novo_no = (arvore *)malloc(sizeof(struct Arvore));
+  // caso já exista um elemento na árvore, ele é
+  // descartado esta função
+  if (novo_no == NULL) 
+  {
+    printf("Erro: Falha ao alocar memória para o novo nó.\n");
+    // peguei do professor que é uma função para sair 
+    // do programa
+    // (se funciona não tem pq mexer nele)
+    exit(-1);
+  }
+
+  //aqui iria criar a arvore e suas ramificações 
+  novo_no->informacao = informacao;
+  novo_no->esquerda = NULL;
+  novo_no->direita = NULL;
+  return novo_no;
+}
+
+arvore *inserir_arvore(arvore *arvore, int valor) {
+  // caso não exista uma arvore este valor se torna a 
+  // raiz
+  if (arvore == NULL)
+    criar_arvore(valor);
+  else {
+    // agora vem de comparar o valor com o valor da raiz
+    // separando ela por lado esquerdo ou direito
+    // neste caso esquerda para valor menores que a raiz
+    // e direita para valores maiores que a raiz
+    if (valor < arvore->informacao)
+      arvore->esquerda = inserir_arvore(arvore->esquerda, valor);
+    else
+      arvore->direita = inserir_arvore(arvore->direita, valor);
+  }
+  // finalizando com uma arvore retornada
+  return arvore;
+}
+
+int busca_binaria(arvore *arvore, int valor) {
+  // aqui seria quando o valor não exista na arvore
+  if (arvore == NULL)
+    return 0;
+  
+  // aqui encontramos o valor (facil de mais) 
+  if (arvore->informacao == valor)
+  {
+    printf("Valor encontrado: %d\n", valor);
+    return 1; 
+  }
+
+  // caso contrario vamos ver se o valor é menor ou 
+  // maior levando ela para a esquerda(menor) ou 
+  // direita(maior)
+  if (arvore->informacao < valor)
+  {
+  return busca_binaria(arvore->esquerda, valor);
+  }
     else
     {
-        if (dado <= raiz->dado)
+      return busca_binaria(arvore->direita, valor);
+    }
+  
+}
+
+// função auxiliar para a função principal 
+// retirar arvore 
+int maior_valor(arvore *arvore)
+{
+  // tem como ação encontrar o maior valor da arvore
+  // no meu caso é a direita
+  while (arvore->direita != NULL)
+      arvore = arvore->direita;
+  return arvore;
+}
+
+
+// função principal para retirar um nó 
+int retirar_arvore(arvore *arvore, int valor)
+{
+  // caso não exista a arvore
+  if (arvore == NULL)
+    return 0;
+
+  // aqui faremos iqual a função binária para achar um 
+  // valor
+  if (valor < arvore->informacao)
+    return retirar_arvore(arvore->esquerda, valor);
+  else
+  {
+    if (valor > arvore->informacao)
+      return retirar_arvore(arvore->direita, valor);
+    else
+    {
+      // caso o valor seja encontrado
+      // vamos verificar se ele tem filhos
+      // caso não tenha filhos
+      if (arvore->esquerda == NULL && arvore->direita == NULL)
+      {
+        // liberamos a memória
+        free(arvore);
+        // e retornamos 0
+        return 0;
+        
+      }
+      else
+      {
+        // caso tenha filhos
+        // vamos verificar se ele tem filho a direita
+        // ou a esquerda
+        // caso tenha filho a direita
+        if (arvore->esquerda == NULL)
         {
-            raiz->esquerda = inserir(raiz->esquerda, dado);
+          // vamos pegar o filho a direita
+          arvore *aux = arvore->direita;
+          // e liberamos a memória
+          free(arvore);
+          // e retornamos o filho a direita
+          return aux;
         }
         else
         {
-            raiz->direita = inserir(raiz->direita, dado);
+          // caso tenha filho a esquerda
+          if (arvore->direita == NULL)
+          {
+            // vamos pegar o filho a esquerda
+            arvore *aux = arvore->esquerda;
+            // e liberamos a memória
+            free(arvore);
+            // e retornamos o filho a esquerda
+            return aux;
+            
+          }
+          else
+          {
+            // caso tenha dois filhos
+            // vamos pegar o maior valor da esquerda
+            // e substituir o valor da arvore
+            arvore->informacao = maior_valor(arvore->esquerda);
+            // e retornamos o valor da arvore
+            return arvore;
+          }
+          
         }
+        
+      }
+      
     }
-    return raiz;
+    
+  } 
 }
 
-struct NoArvore *encontrarMinimo(struct NoArvore *raiz)
+int mostrar_arvore(arvore *arvore)
 {
-    struct NoArvore *atual = raiz;
-    while (atual->esquerda != NULL)
-    {
-        atual = atual->esquerda;
-    }
-    return atual;
-}
-
-struct NoArvore *excluir(struct NoArvore *raiz, int valor)
-{
-    if (raiz == NULL)
-    {
-        return raiz;
-    }
-
-    if (valor < raiz->dado)
-    {
-        raiz->esquerda = excluir(raiz->esquerda, valor);
-    }
-    else if (valor > raiz->dado)
-    {
-        raiz->direita = excluir(raiz->direita, valor);
-    }
-    else
-    {
-        // Caso 1: Nó folha ou nó com apenas um filho
-        if (raiz->esquerda == NULL)
-        {
-            struct NoArvore *temp = raiz->direita;
-            free(raiz);
-            return temp;
-        }
-        else if (raiz->direita == NULL)
-        {
-            struct NoArvore *temp = raiz->esquerda;
-            free(raiz);
-            return temp;
-        }
-
-        // Caso 2: Nó com dois filhos, encontra o sucessor in-order (menor valor na subárvore direita)
-        struct NoArvore *temp = encontrarMinimo(raiz->direita);
-        raiz->dado = temp->dado;
-        raiz->direita = excluir(raiz->direita, temp->dado);
-    }
-    return raiz;
-}
-
-void percorrerEmOrdem(struct NoArvore *raiz)
-{
-    if (raiz != NULL)
-    {
-        percorrerEmOrdem(raiz->esquerda);
-        printf("%d ", raiz->dado);
-        percorrerEmOrdem(raiz->direita);
-    }
-}
-
-void percorrerPreOrdem(struct NoArvore *raiz)
-{
-    if (raiz != NULL)
-    {
-        printf("%d ", raiz->dado);
-        percorrerEmOrdem(raiz->esquerda);
-        percorrerEmOrdem(raiz->direita);
-    }
-}
-
-void percorrerPosOrdem(struct NoArvore *raiz)
-{
-    if (raiz != NULL)
-    {
-        percorrerEmOrdem(raiz->esquerda);
-        percorrerEmOrdem(raiz->direita);
-        printf("%d ", raiz->dado);
-    }
-}
-
-// Função auxiliar para imprimir um caractere precedido por uma quantidade específica de espaços
-void imprimeNo(int c, int b)
-{
-    int i;
-    for (i = 0; i < b; i++)
-        printf("   ");
-    printf("%i\n", c);
-}
-
-// Função para exibir a árvore no formato esquerda-raiz-direita segundo Sedgewick
-void mostraArvore(struct NoArvore *a, int b)
-{
-    if (a == NULL)
-    {
-        return;
-    }
-    mostraArvore(a->direita, b + 1);
-    imprimeNo(a->dado, b); // Convertendo para caractere para imprimir
-    mostraArvore(a->esquerda, b + 1);
-}
-
-int main()
-{
-    struct NoArvore *raiz = NULL;
-
-    // Inserindo elementos na árvore
-    raiz = inserir(raiz, 1);
-    raiz = inserir(raiz, 2);
-    raiz = inserir(raiz, 3);
-    raiz = inserir(raiz, 4);
-    raiz = inserir(raiz, 5);
-    raiz = inserir(raiz, 6);
-    raiz = inserir(raiz, 7);
-    raiz = inserir(raiz, 8);
-    raiz = inserir(raiz, 9);
-    raiz = inserir(raiz, 10);
-
-    mostraArvore(raiz, 3);
-    excluir(raiz,5);
-    mostraArvore(raiz,3);
-    /* Imprimindo a árvore em ordem
-    printf("\nÁrvore em pré-ordem: ");
-    percorrerPreOrdem(raiz);
-    printf("\n");
-
-    printf("Árvore em ordem: ");
-    percorrerEmOrdem(raiz);
-    printf("\n");
-
-    printf("Árvore em pós-ordem: ");
-    percorrerPosOrdem(raiz);
-    printf("\n");*/
-
+  // caso não exista a arvore
+  if (arvore == NULL)
     return 0;
+  // aqui vamos mostrar a arvore em ordem crescente
+  // primeiro a esquerda
+  
+  
+}
+
+
+int main(void) {
+  struct Arvore *arvore = NULL;
+
+  arvore = inserir_arvore(arvore, 5);
+  arvore = inserir_arvore(arvore, 1);
+  arvore = inserir_arvore(arvore, 2);
+  arvore = inserir_arvore(arvore, 3);
+  arvore = inserir_arvore(arvore, 4);
+  arvore = inserir_arvore(arvore, 6);
+  arvore = inserir_arvore(arvore, 7);
+  arvore = inserir_arvore(arvore, 8);
+  arvore = inserir_arvore(arvore, 9);
+
+  printf("Hello World\n");
+  return 0;
 }
