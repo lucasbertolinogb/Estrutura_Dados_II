@@ -145,11 +145,10 @@ arvore *retirar_arvore(arvore *arvore, int valor) {
   // aqui faremos iqual a função binária para achar um
   // valor
   if (valor < arvore->informacao)
-    return retirar_arvore(arvore->esquerda, valor);
-  else {
-    if (valor > arvore->informacao)
-      return retirar_arvore(arvore->direita, valor);
-    else {
+     retirar_arvore(arvore->esquerda, valor);
+  else if (valor > arvore->informacao)
+       retirar_arvore(arvore->direita, valor);
+  else if(valor == arvore->informacao){
       // caso o valor seja encontrado
       // vamos verificar se ele tem filhos
       // caso não tenha filhos
@@ -186,13 +185,16 @@ arvore *retirar_arvore(arvore *arvore, int valor) {
             // vamos pegar o maior valor da esquerda
             // e substituir o valor da arvore
             arvore->informacao = maior_valor(arvore->esquerda);
-            // e retornamos o valor da arvore
-            return arvore;
+            // e com arvore->informação sendo o mairo valor 
+            // agora podemos retirar este nó
+
+            arvore->esquerda = retirar_arvore(arvore->esquerda, arvore->informacao);
           }
         }
       }
     }
-  }
+  return arvore;;
+  
 }
 
 void mostrar_arvore(arvore *arvore) {
