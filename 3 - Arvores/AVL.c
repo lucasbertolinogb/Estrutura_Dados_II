@@ -1,425 +1,294 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Definição da estrutura do nó da árvore AVL
-// São utilizados três parâmetros: dado, esquerda e direita, além da altura para balanceamento
-struct NoAVL
-{
-    int dado;
-    struct NoAVL *esquerda;
-    struct NoAVL *direita;
-    int altura;
-};
+/*• Crie em C a estrutura de uma árvore binária cuja
+* informação seja um inteiro.
+*Escreva funções que recebam um ponteiro para a raiz da
+* árvore AVL e façam:
+• Função de balanceamento;
+• Inserção de um elemento na árvore;
+• Pesquisa de um elemento na árvore;
+• Exclusão de um elemento na árvore.
+  */
 
-// Função para criar um novo nó na árvore
-// Recebe um valor inteiro como parâmetro e retorna um ponteiro para o novo nó
-struct NoAVL *criarNo(int dado)
-{
-    // Aloca memória para um novo nó da árvore AVL
-    struct NoAVL *novoNo = (struct NoAVL *)malloc(sizeof(struct NoAVL));
-    // Verifica se a alocação de memória foi bem-sucedida
-    if (novoNo == NULL)
-    {
-        // Imprime uma mensagem de erro e encerra o programa caso a alocação falhe
-        printf("Erro: Falha ao alocar memória para o novo nó.\n");
-        exit(-1);
-    }
-    novoNo->dado = dado;     // Armazena o valor fornecido dentro do nó
-    novoNo->esquerda = NULL; // Inicializa o ponteiro para o filho esquerdo como nulo
-    novoNo->direita = NULL;  // Inicializa o ponteiro para o filho direito como nulo
-    novoNo->altura = 0;      // Inicializa a altura do nó como 0
-    return novoNo;           // Retorna o ponteiro para o novo nó criado
+// Criação da estrutura da árvore
+typedef struct Arvore {
+  struct Arvore *esquerda;
+  struct Arvore *direita;
+  int informacao;
+} arvore;
+
+// Verifica a altura da árvore
+int verificar_arvore_altura(arvore *arvore) {
+  // Se a árvore estiver vazia, retorna -1
+  int tamanho_esquerda = -1, tamanho_direita = -1;
+  if (arvore == NULL) // nao existe arvore
+    return printf("Arvore nula");
+
+  if (arvore->esquerda == NULL) {
+    // para de buscar altura
+  } else // caso existe mais uma altura a função percorre o caminho da esquerda
+  {
+    tamanho_esquerda = verificar_arvore_altura(arvore->esquerda);
+  }
+
+  if (arvore->direita == NULL) {
+    // para de buscar altura
+  } else // caso existe mais uma altura a função percorre o caminho da direita
+  {
+    tamanho_direita = verificar_arvore_altura(arvore->direita);
+  }
+
+  // se temos um tamanho arvore direita e esquerda
+  // retornamos o maior valor, no caso, o
+  // tamanho da arvore
+  if (tamanho_esquerda > tamanho_direita)
+    return tamanho_esquerda++;
+  else
+    return tamanho_direita++;
+
+  // no final disso tudo deve retornar o tamanho da
+  // arvore
 }
 
-// Função para calcular a altura de um nó
-// Recebe um ponteiro para o nó como parâmetro e retorna um inteiro representando a altura do nó
-int altura(struct NoAVL *no)
-{
-    // Verifica se o nó é nulo
-    if (no == NULL)
-        return -1;      // Se for nulo, retorna 0
-    return no->altura; // Retorna a altura armazenada no nó
+// Criação da árvore
+arvore *criar_arvore(int informacao) {
+  // Aqui teremos o ponteiro para a raiz da árvore, ou
+  // seja, o primeiro elemento da árvore
+  arvore *novo_no = (arvore *)malloc(sizeof(struct Arvore));
+  // caso já exista um elemento na árvore, ele é
+  // descartado esta função
+  if (novo_no == NULL) {
+    printf("Erro: Falha ao alocar memória para o novo nó.\n");
+    // peguei do professor que é uma função para sair
+    // do programa
+    // (se funciona não tem pq mexer nele)
+    exit(-1);
+  }
+
+  // aqui iria criar a arvore e suas ramificações
+  novo_no->informacao = informacao;
+  novo_no->esquerda = NULL;
+  novo_no->direita = NULL;
+  return novo_no;
 }
 
-// Função para calcular o fator de balanceamento de um nó
-// Recebe um ponteiro para o nó como parâmetro e retorna um inteiro representando o fator de balanceamento
-int fatorBalanceamento(struct NoAVL *no)
-{
-    // Verifica se o nó é nulo
-    if (no == NULL)
-        return 0; // Se for nulo, retorna 0
-    // Calcula o fator de balanceamento subtraindo a altura da subárvore direita pela altura da subárvore esquerda
-    return altura(no->esquerda) - altura(no->direita);
-}
-// Caso esteja desbalanceado e precise rotacionar à direita em torno do nó
-struct NoAVL *rotacaoDireita(struct NoAVL *no)
-{
-    struct NoAVL *novaRaiz = no->esquerda;       // Define a nova raiz como o nó à esquerda
-    struct NoAVL *subArvore = novaRaiz->direita; // Define a subárvore como a subárvore direita da nova raiz
-
-    // Realiza a rotação
-    novaRaiz->direita = no;   // Define o nó como filho direito da nova raiz
-    no->esquerda = subArvore; // Define a subárvore direita da nova raiz como filho esquerdo do nó
-
-    // Atualiza as alturas
-    if (altura(no->esquerda) > altura(no->direita)) // Verifica a altura da subárvore esquerda
-        no->altura = 1 + altura(no->esquerda);      // Atualiza a altura do nó
+arvore *inserir_arvore(arvore *arvore, int valor) {
+  // caso não exista uma arvore este valor se torna a
+  // raiz
+  if (arvore == NULL) {
+    return criar_arvore(valor);
+    exit(-1);
+  } else {
+    // agora vem de comparar o valor com o valor da raiz
+    // separando ela por lado esquerdo ou direito
+    // neste caso esquerda para valor menores que a raiz
+    // e direita para valores maiores que a raiz
+    if (valor < arvore->informacao)
+      arvore->esquerda = inserir_arvore(arvore->esquerda, valor);
     else
-        no->altura = 1 + altura(no->direita); // Atualiza a altura do nó
-
-    if (altura(novaRaiz->esquerda) > altura(novaRaiz->direita)) // Verifica a altura da subárvore esquerda da nova raiz
-        novaRaiz->altura = 1 + altura(novaRaiz->esquerda);      // Atualiza a altura da nova raiz
-    else
-        novaRaiz->altura = 1 + altura(novaRaiz->direita); // Atualiza a altura da nova raiz
-
-    return novaRaiz; // Retorna a nova raiz após a rotação
+      arvore->direita = inserir_arvore(arvore->direita, valor);
+  }
+  // finalizando com uma arvore retornada
+  return arvore;
 }
 
-// Caso esteja desbalanceado e precise rotacionar à direita em torno de nó
-struct NoAVL *rotacaoEsquerda(struct NoAVL *no)
-{
-    struct NoAVL *novaRaiz = no->direita;         // Define a nova raiz como o nó à direita
-    struct NoAVL *subArvore = novaRaiz->esquerda; // Define a subárvore como a subárvore esquerda da nova raiz
+int busca_binaria(arvore *arvore, int valor) {
+  // aqui seria quando o valor não exista na arvore
+  if (arvore == NULL)
+    return 0;
 
-    // Realiza a rotação
-    novaRaiz->esquerda = no; // Define o nó como filho esquerdo da nova raiz
-    no->direita = subArvore; // Define a subárvore esquerda da nova raiz como filho direito do nó
+  // aqui encontramos o valor (facil de mais)
+  if (arvore->informacao == valor) {
+    printf("Valor encontrado: %d\n", valor);
+    return 1;
+  }
 
-    // Atualiza as alturas
-    if (altura(no->esquerda) > altura(no->direita)) // Verifica a altura da subárvore esquerda
-        no->altura = 1 + altura(no->esquerda);      // Atualiza a altura do nó
-    else
-        no->altura = 1 + altura(no->direita); // Atualiza a altura do nó
-
-    if (altura(novaRaiz->esquerda) > altura(novaRaiz->direita)) // Verifica a altura da subárvore esquerda da nova raiz
-        novaRaiz->altura = 1 + altura(novaRaiz->esquerda);      // Atualiza a altura da nova raiz
-    else
-        novaRaiz->altura = 1 + altura(novaRaiz->direita); // Atualiza a altura da nova raiz
-
-    return novaRaiz; // Retorna a nova raiz após a rotação
+  // caso contrario vamos ver se o valor é menor ou
+  // maior levando ela para a esquerda(menor) ou
+  // direita(maior)
+  if (arvore->informacao < valor) {
+    return busca_binaria(arvore->esquerda, valor);
+  } else {
+    return busca_binaria(arvore->direita, valor);
+  }
 }
 
-// Função que vai realizar o balanceamento da árvore
-// Utiliza as funções anteriores para analisar cada caso
-struct NoAVL *balanceamento(struct NoAVL *raiz, int dado)
-{
-    // Atualiza a altura do nó atual
-    if (raiz == NULL) // Se a raiz for nula, retorna a raiz
-    {
-        return raiz;
-    }
-    if (altura(raiz->esquerda) > altura(raiz->direita)) // Verifica a altura da subárvore esquerda
-    {
-        raiz->altura = 1 + altura(raiz->esquerda); // Atualiza a altura da raiz
-    }
-    else
-    {
-        raiz->altura = 1 + altura(raiz->direita); // Atualiza a altura da raiz
-    }
-
-    // Calcula o fator de balanceamento deste nó para verificar se ele se tornou desbalanceado
-    int balanceamento = fatorBalanceamento(raiz); // Calcula o fator de balanceamento da raiz
-
-    // Caso de desbalanceamento à esquerda-esquerda
-    if (balanceamento > 1 && dado < raiz->esquerda->dado) // Se o fator de balanceamento for maior que 1 e o dado for menor que o dado da subárvore esquerda
-        return rotacaoDireita(raiz);                      // Realiza rotação à direita
-
-    // Caso de desbalanceamento à direita-direita
-    if (balanceamento < -1 && dado > raiz->direita->dado) // Se o fator de balanceamento for menor que -1 e o dado for maior que o dado da subárvore direita
-        return rotacaoEsquerda(raiz);                     // Realiza rotação à esquerda
-
-    // Caso de desbalanceamento à esquerda-direita
-    if (balanceamento > 1 && dado > raiz->esquerda->dado) // Se o fator de balanceamento for maior que 1 e o dado for maior que o dado da subárvore esquerda
-    {
-        raiz->esquerda = rotacaoEsquerda(raiz->esquerda); // Realiza rotação à esquerda na subárvore esquerda da raiz
-        return rotacaoDireita(raiz);                      // Realiza rotação à direita na raiz
-    }
-
-    // Caso de desbalanceamento à direita-esquerda
-    if (balanceamento < -1 && dado < raiz->direita->dado) // Se o fator de balanceamento for menor que -1 e o dado for menor que o dado da subárvore direita
-    {
-        raiz->direita = rotacaoDireita(raiz->direita); // Realiza rotação à direita na subárvore direita da raiz
-        return rotacaoEsquerda(raiz);                  // Realiza rotação à esquerda na raiz
-    }
-
-    // Retorna a raiz inalterada
-    return raiz; // Retorna a raiz após o balanceamento
+// função auxiliar para a função principal
+// retirar arvore
+int maior_valor(arvore *arvore) {
+  // tem como ação encontrar o maior valor da arvore
+  // no meu caso é a direita
+  while (arvore->direita != NULL) {
+    arvore = arvore->direita;
+  }
+  // retornamos o valor
+  return arvore->informacao;
 }
 
-// Função para inserir um novo nó na árvore AVL
-struct NoAVL *inserir(struct NoAVL *raiz, int dado)
-{
-    // Verifica se a raiz é nula, indicando que estamos em uma folha da árvore ou que a árvore está vazia
-    if (raiz == NULL)
-    {
-        // Se a raiz for nula, cria um novo nó com o dado fornecido e o retorna como a nova raiz da árvore
-        return criarNo(dado);
-    }
+// Aqui é minha arvore auxiliar para retornar a arvore sem
+// o nó desejado , ou seja, que já tenha a função de remover
+// feita nela
+arvore *aux;
 
-    // Se o dado a ser inserido for menor que o valor da raiz atual, insere recursivamente na subárvore esquerda
-    if (dado < raiz->dado)
-    {
-        raiz->esquerda = inserir(raiz->esquerda, dado);
-    }
-    // Se o dado for maior que o valor da raiz atual, insere recursivamente na subárvore direita
-    else if (dado > raiz->dado)
-    {
-        raiz->direita = inserir(raiz->direita, dado);
-    }
-    else
-    {
-        // Se o dado for igual ao valor da raiz atual, não faz nada (dados iguais não são permitidos na árvore AVL)
-        return raiz;
-    }
+// função principal para retirar um nó
+arvore *retirar_arvore(arvore *arvore, int valor) {
+  // caso não exista a arvore
+  if (arvore == NULL) {
+    return NULL;
+    printf("Arvore nula ou ausencia de valor");
+    // diferente dos outros casos que eu uso return
+    // aqui usarei return NULL para indicar a ausência
+    // de arvore ou sua retirada
+  }
 
-    // Após a inserção, chama a função de balanceamento para garantir que a árvore permaneça balanceada
-    return balanceamento(raiz, dado);
-}
-
-// Encontra o menor valor na árvore AVL
-struct NoAVL *encontrarMinimo(struct NoAVL *no)
-{
-    struct NoAVL *atual = no;
-
-    // Percorre a subárvore esquerda até encontrar o nó mais à esquerda
-    while (atual && atual->esquerda != NULL)
-        atual = atual->esquerda;
-
-    return atual;
-}
-
-struct NoAVL* encontrarMaximo(struct NoAVL* no) {
-    // Verifica se o nó fornecido é válido
-    if (no == NULL)
+  // aqui faremos iqual a função binária para achar um
+  // valor
+  if (valor < arvore->informacao)
+    return retirar_arvore(arvore->esquerda, valor);
+  else {
+    if (valor > arvore->informacao)
+      return retirar_arvore(arvore->direita, valor);
+    else {
+      // caso o valor seja encontrado
+      // vamos verificar se ele tem filhos
+      // caso não tenha filhos
+      if (arvore->esquerda == NULL && arvore->direita == NULL) {
+        // liberamos a memória
+        free(arvore);
+        // e retornamos a nó vazio
         return NULL;
 
-    // Percorre a subárvore à esquerda até encontrar o nó mais à direita
-    while (no->direita != NULL) {
-        no = no->direita;
-    }
-
-    // Retorna o nó mais à direita da subárvore esquerda
-    return no;
-}
-
-
-// Função para excluir um nó na árvore AVL
-struct NoAVL *excluir(struct NoAVL *raiz, int valor) {
-    if (raiz == NULL) // Verifica se o nó a ser excluído existe ou é nulo
-    {
-        return raiz;
-    }
-
-    if (valor < raiz->dado) // Verifica se o dado está à esquerda
-    {
-        raiz->esquerda = excluir(raiz->esquerda, valor); // Chama a função recursivamente até encontrar o nó a ser excluído
-    }
-    else if (valor > raiz->dado) // Verifica se o dado está à direita
-    {
-        raiz->direita = excluir(raiz->direita, valor); // Chama a função recursivamente até encontrar o nó a ser excluído
-    }
-    else // Se o nó atual for igual ao valor a ser excluído
-    {
-        // Caso 1: Nó folha ou nó com apenas um filho
-        if (raiz->esquerda == NULL) // Se tiver apenas filhos à direita
-        {
-            struct NoAVL *temp = raiz->direita; // Define qual nó filho irá substituir o pai, nesse caso, o nó à direita.
-            free(raiz);                         // Libera o valor do nó da memória
-            return temp;                        // Retorna o nó que irá substituir o nó pai
-        }
-        else if (raiz->direita == NULL) // Se tiver apenas filhos à esquerda
-        {
-            struct NoAVL *temp = raiz->esquerda; // Define qual nó filho irá substituir o pai, nesse caso, o nó à esquerda.
-            free(raiz);                         // Libera o valor do nó da memória
-            return temp;                        // Retorna o nó que irá substituir o nó pai
-        }
-
-        // Caso 2: Nó com dois filhos
-        // Verifica o balanceamento antes de decidir entre o valor maior à direita da subárvore esquerda ou o menor valor à esquerda da subárvore direita
-        if (altura(raiz->esquerda) >= altura(raiz->direita)) {
-            // Se a altura da subárvore esquerda for maior, escolhe o maior valor à direita da subárvore esquerda
-            struct NoAVL *temp = encontrarMaximo(raiz->esquerda); // Encontra o maior valor na subárvore esquerda
-            raiz->dado = temp->dado;                              // Copia o valor do sucessor in-order (maior valor na subárvore esquerda) para a raiz atual
-            raiz->esquerda = excluir(raiz->esquerda, temp->dado); // Remove o nó com o valor copiado da subárvore esquerda
+      } else {
+        // caso tenha filhos
+        // vamos verificar se ele tem filho a direita
+        // ou a esquerda
+        // caso tenha filho a direita
+        if (arvore->esquerda == NULL) {
+          // vamos pegar o filho a direita
+          aux = arvore->direita;
+          // e liberamos a memória
+          free(arvore);
+          // e retornamos o filho a direita
+          return aux;
         } else {
-            // Caso contrário, escolhe o menor valor à esquerda da subárvore direita
-            struct NoAVL *temp = encontrarMinimo(raiz->direita); // Encontra o menor valor na subárvore direita
-            raiz->dado = temp->dado;                              // Copia o valor do sucessor in-order (menor valor na subárvore direita) para a raiz atual
-            raiz->direita = excluir(raiz->direita, temp->dado);   // Remove o nó com o valor copiado da subárvore direita
+          // caso tenha filho a esquerda
+          if (arvore->direita == NULL) {
+            // vamos pegar o filho a esquerda
+            aux = arvore->esquerda;
+            // e liberamos a memória
+            free(arvore);
+            // e retornamos o filho a esquerda
+            return aux;
+
+          } else {
+            // caso tenha dois filhos
+            // vamos pegar o maior valor da esquerda
+            // e substituir o valor da arvore
+            arvore->informacao = maior_valor(arvore->esquerda);
+            // e retornamos o valor da arvore
+            return arvore;
+          }
         }
+      }
     }
-
-    // Após a exclusão, chama a função de balanceamento para garantir que a árvore permaneça balanceada
-    return balanceamento(raiz, valor);
+  }
 }
 
+void mostrar_arvore(arvore *arvore) {
+  // caso não exista a arvore
+  if (arvore == NULL)
+    return;
 
-// Função para percorrer a árvore em ordem
-void percorrerEmOrdem(struct NoAVL *raiz)
-{
-    if (raiz != NULL) // Verifica se o nó atual não é nulo
-    {
-        percorrerEmOrdem(raiz->esquerda); // Percorre a subárvore esquerda
-        printf("%d ", raiz->dado);        // Imprime o valor do nó atual
-        percorrerEmOrdem(raiz->direita);  // Percorre a subárvore direita
-    }
+  // obrigo a não retornar algo estranho da arvore
+  if (arvore != NULL) {
+    // peguei do professor que é uma função de retorno
+    // em pré-ordem
+    // explicação dela : pega a raiz , depois a esquerda e
+    // finaliza com a direita (RED)
+    printf("%d ", arvore->informacao);
+    mostrar_arvore(arvore->esquerda);
+    mostrar_arvore(arvore->direita);
+  }
 }
 
-// Função para percorrer a árvore em pré-ordem
-void percorrerPreOrdem(struct NoAVL *raiz)
-{
-    if (raiz != NULL) // Verifica se o nó atual não é nulo
-    {
-        printf("%d ", raiz->dado);        // Imprime o valor do nó atual
-        percorrerEmOrdem(raiz->esquerda); // Percorre a subárvore esquerda
-        percorrerEmOrdem(raiz->direita);  // Percorre a subárvore direita
-    }
-}
+int main(void) {
+  struct Arvore *arvore = NULL;
 
-// Função para percorrer a árvore em pós-ordem
-void percorrerPosOrdem(struct NoAVL *raiz)
-{
-    if (raiz != NULL) // Verifica se o nó atual não é nulo
-    {
-        percorrerEmOrdem(raiz->esquerda); // Percorre a subárvore esquerda
-        percorrerEmOrdem(raiz->direita);  // Percorre a subárvore direita
-        printf("%d ", raiz->dado);        // Imprime o valor do nó atual
-    }
-}
+  // testando uma arvore simples
+  printf("Teste 1:\n");
+  arvore = inserir_arvore(arvore, 10);
+  mostrar_arvore(arvore); // esperado 10
+  printf("\n\n");
 
-// Função auxiliar para imprimir um caractere precedido por uma quantidade específica de espaços
-void imprimeNo(int c, int b)
-{
-    int i;
-    for (i = 0; i < b; i++) // Loop para imprimir espaços proporcionais à profundidade
-        printf("   ");
-    printf("%i\n", c); // Imprime o valor do nó com a devida indentação
-}
+  // limpeza da arvore (mister clean clode :P)
+  arvore = NULL;
 
-// Função para exibir a árvore no formato esquerda-raiz-direita segundo Sedgewick
-void mostraArvore(struct NoAVL *a, int b)
-{
-    if (a != NULL) // Verifica se o nó atual não é nulo
-    {
-        // Chama a função recursivamente para percorrer a subárvore direita
-        mostraArvore(a->direita, b + 1);
-        // Imprime o nó atual com um espaçamento proporcional à sua profundidade
-        imprimeNo(a->dado, b);
-        // Chama a função recursivamente para percorrer a subárvore esquerda
-        mostraArvore(a->esquerda, b + 1);
-    }
-}
-/*
-3 - Escreva uma função para calcular a altura de uma árvore AVL.
-Peça ao usuário para inserir elementos em uma árvore AVL e, em seguida,
-exiba a altura da árvore resultante.*/
-// Função para calcular a altura de uma árvore AVL
-int alturaTree(struct NoAVL *no)
-{
-    if (no == NULL)
-    { // Se o nó for nulo, a altura é -1
-        return -1;
-    }
+  // testando um arvore com multiplos valores crescentes
+  printf("Teste 2:\n");
+  arvore = inserir_arvore(arvore, 7);
+  arvore = inserir_arvore(arvore, 8);
+  arvore = inserir_arvore(arvore, 9);
+  arvore = inserir_arvore(arvore, 10);
+  mostrar_arvore(arvore); // esperado 7 8 9 10
+  printf("\n\n");
 
-    // Calcula a altura da subárvore esquerda e direita
-    int altura_esquerda = alturaTree(no->esquerda) + 1;
-    int altura_direita = alturaTree(no->direita) + 1;
+  // limpeza da arvore
+  arvore = NULL;
 
-    // Retorna a maior altura entre a subárvore esquerda e direita, somada à altura do nó atual
-    if (1 + ((altura_esquerda > altura_direita)))
-    {
-        return altura_esquerda;
-    }
-    else
-    {
-        return altura_direita;
-    }
-}
+  // Inserção de nos na arvore de modo aleatório
+  printf("Teste 3:\n");
 
-// Buscar elemento na árvore
-struct NoAVL *buscarNo(struct NoAVL *raiz, int valor)
-{
-    if (raiz == NULL || raiz->dado == valor)
-        return raiz;
+  /*
+          9
+        8     12
+      7     10   13
+              11
+      resultado: 9, 8, 7, 12, 10, 11, 13
+    */
+  arvore = inserir_arvore(arvore, 9);
+  arvore = inserir_arvore(arvore, 12);
+  arvore = inserir_arvore(arvore, 8);
+  arvore = inserir_arvore(arvore, 13);
+  arvore = inserir_arvore(arvore, 7);
+  arvore = inserir_arvore(arvore, 10);
+  arvore = inserir_arvore(arvore, 11);
+  mostrar_arvore(arvore);
+  printf("\n\n");
 
-    if (valor < raiz->dado)
-        return buscarNo(raiz->esquerda, valor);
-    else
-        return buscarNo(raiz->direita, valor);
-}
+  // usando a mesma arvore de antes
+  // testando valor duplicado
+  printf("Teste 4:\n");
+  arvore = inserir_arvore(arvore, 9); 
+  mostrar_arvore(arvore);//esperado: 9, 8, 7, 12, 10, 9 , 11, 13
+  /*
+      9
+    8     12
+  7     10   13
+       9  11
+       
+  */
+  printf("\n\n");
 
-/* // Teste de altura
-struct NoAVL *raiz = NULL;
-raiz = inserir(raiz, 30);
-raiz = inserir(raiz, 31);
-printf("%d",altura(buscarNo(raiz,NULL))); // ÁRVORE VAZIA = -1
-printf("%d",altura(buscarNo(raiz,31))); // FOLHA = 0;
-mostraArvore(raiz,3);
-*/
+  
+  // Daqui em diante sera um caso de teste para remover_arvore
+  // removendo nenhum filho existente 
+  printf("Teste 5:\n");
+  retirar_arvore(arvore,5);
+  mostrar_arvore(arvore); // esperado  o mesmo do teste 4
+  printf("\n\n");
 
-/*4 - Escreva uma função para verificar se uma árvore é uma árvore AVL válida,
-ou seja, se ela satisfaz todas as propriedades de uma árvore AVL.
- Teste sua função em diferentes árvores AVL, incluindo árvores corretas
- e incorretas, e verifique se a função retorna os resultados esperados.
-*/
-int main()
-{
+  arvore = NULL;
+  
 
-    struct NoAVL *raiz = NULL;
-    //Inserindo elementos na árvore AVL
-    raiz = inserir(raiz, 30);
-    raiz = inserir(raiz, 24);
-    raiz = inserir(raiz, 20);
-    raiz = inserir(raiz, 35);
-    raiz = inserir(raiz, 27);
-    raiz = inserir(raiz, 33);
-    raiz = inserir(raiz, 38);
-    raiz = inserir(raiz, 25);
-    raiz = inserir(raiz, 22);
-    raiz = inserir(raiz, 34);
-    raiz = inserir(raiz, 40);
-    raiz = inserir(raiz, 29);
-    mostraArvore(raiz, 3);
-   
-    printf("\nLetra A - Insere 31 ---------------------------\n");
-    raiz = inserir(raiz, 31);
-    mostraArvore(raiz, 3);
-   
-    printf("\nLetra B - Insere 15 ---------------------------\n");
-    raiz = inserir(raiz, 15);
-    mostraArvore(raiz, 3);
-   
-    printf("\nLetra C - Insere 23 ----------------------------\n");
-    raiz = inserir(raiz, 23);
-    mostraArvore(raiz, 3);
-   
-    printf("\nLetra D - Exclui 24 ---------------------------\n");
-    raiz = excluir(raiz, 24);
-    mostraArvore(raiz, 3);
-   
-    printf("\nLetra E - Exclui 35 ---------------------------\n");
-    raiz = excluir(raiz, 35);
-    mostraArvore(raiz, 3);
-
-     printf("\nLetra F - Inserir 24 ---------------------------\n");
-    raiz = inserir(raiz, 24);
-    mostraArvore(raiz, 3);
-
-     printf("\nLetra G - Exclui 27 ---------------------------\n");
-    raiz = excluir(raiz, 27);
-    mostraArvore(raiz, 3);
-
-     printf("\nLetra H - Inserir 32 ---------------------------\n");
-    raiz = inserir(raiz, 32);
-    mostraArvore(raiz, 3);
-
-     printf("\nLetra I - Exclui 30 ---------------------------\n");
-    raiz = excluir(raiz, 30);
-    mostraArvore(raiz, 3);
+  // removendo um filho 
+  printf("Teste 6:\n");
+  retirar_arvore(arvore, 7);
+  mostrar_arvore(arvore); // esperado: 9, 8, 12, 10,11, 13
+  printf("\n\n");
     
-    printf("\nLetra J - Inserir 21 ---------------------------\n");
-    raiz = inserir(raiz, 21);
-    mostraArvore(raiz, 3);
+  
+  printf("Teste 7:\n");
 
-    return 0;
+  return 0;
 }
