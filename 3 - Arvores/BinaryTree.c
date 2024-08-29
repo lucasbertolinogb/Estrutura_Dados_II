@@ -5,7 +5,6 @@
 * informação seja um inteiro.
 *Escreva funções que recebam um ponteiro para a raiz da
 * árvore AVL e façam:
-• Função de balanceamento;
 • Inserção de um elemento na árvore;
 • Pesquisa de um elemento na árvore;
 • Exclusão de um elemento na árvore.
