@@ -1,21 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// NOME: LUCAS BERTOLINO SANTOS COSTA 
-// TURMA: CC6M 
-// MATÉRIA: Estrutua de dados II
-
-//Atividade a ser feita =>
-/*• Crie em C a estrutura de uma árvore binária cuja 
+/*• Crie em C a estrutura de uma árvore binária cuja
 * informação seja um inteiro.
-*Escreva funções que recebam um ponteiro para a raiz da 
+*Escreva funções que recebam um ponteiro para a raiz da
 * árvore AVL e façam:
 • Função de balanceamento;
 • Inserção de um elemento na árvore;
 • Pesquisa de um elemento na árvore;
 • Exclusão de um elemento na árvore.
   */
-  
 
 // Criação da estrutura da árvore
 typedef struct Arvore {
@@ -141,8 +135,8 @@ arvore *aux;
 arvore *retirar_arvore(arvore *arvore, int valor) {
   // caso não exista a arvore
   if (arvore == NULL) {
-    return NULL;
     printf("Arvore nula ou ausencia de valor");
+    return NULL;
     // diferente dos outros casos que eu uso return
     // aqui usarei return NULL para indicar a ausência
     // de arvore ou sua retirada
@@ -151,56 +145,54 @@ arvore *retirar_arvore(arvore *arvore, int valor) {
   // aqui faremos iqual a função binária para achar um
   // valor
   if (valor < arvore->informacao)
-     retirar_arvore(arvore->esquerda, valor);
+    arvore->esquerda = retirar_arvore(arvore->esquerda, valor);
   else if (valor > arvore->informacao)
-       retirar_arvore(arvore->direita, valor);
-  else if(valor == arvore->informacao){
-      // caso o valor seja encontrado
-      // vamos verificar se ele tem filhos
-      // caso não tenha filhos
-      if (arvore->esquerda == NULL && arvore->direita == NULL) {
-        // liberamos a memória
-        free(arvore);
-        // e retornamos a nó vazio
-        return NULL;
+    arvore->direita = retirar_arvore(arvore->direita, valor);
+  else {
+    // caso o valor seja encontrado
+    // vamos verificar se ele tem filhos
+    // caso não tenha filhos
+    if (arvore->esquerda == NULL && arvore->direita == NULL) {
+      // liberamos a memória
+      free(arvore);
+      // e retornamos a nó vazio
+      return NULL;
 
-      } else {
-        // caso tenha filhos
-        // vamos verificar se ele tem filho a direita
-        // ou a esquerda
-        // caso tenha filho a direita
-        if (arvore->esquerda == NULL) {
-          // vamos pegar o filho a direita
-          aux = arvore->direita;
+    } else if (arvore->esquerda == NULL) {
+      // caso tenha filhos
+      // vamos verificar se ele tem filho a direita
+      // ou a esquerda
+      // caso tenha filho a direita
+       
+        // vamos pegar o filho a direita
+        aux = arvore->direita;
+        // e liberamos a memória
+        free(arvore);
+        // e retornamos o filho a direita
+        return aux;
+      } else if (arvore->direita == NULL){
+        // caso tenha filho a esquerda
+         
+          // vamos pegar o filho a esquerda
+          aux = arvore->esquerda;
           // e liberamos a memória
           free(arvore);
-          // e retornamos o filho a direita
+          // e retornamos o filho a esquerda
           return aux;
+
         } else {
-          // caso tenha filho a esquerda
-          if (arvore->direita == NULL) {
-            // vamos pegar o filho a esquerda
-            aux = arvore->esquerda;
-            // e liberamos a memória
-            free(arvore);
-            // e retornamos o filho a esquerda
-            return aux;
+          // caso tenha dois filhos
+          // vamos pegar o maior valor da esquerda
+          // e substituir o valor da arvore
+          arvore->informacao = maior_valor(arvore->esquerda);
+          // e com arvore->informação sendo o mairo valor
+          // agora podemos retirar este nó
 
-          } else {
-            // caso tenha dois filhos
-            // vamos pegar o maior valor da esquerda
-            // e substituir o valor da arvore
-            arvore->informacao = maior_valor(arvore->esquerda);
-            // e com arvore->informação sendo o mairo valor 
-            // agora podemos retirar este nó
-
-            arvore->esquerda = retirar_arvore(arvore->esquerda, arvore->informacao);
-          }
+          arvore->esquerda =
+              retirar_arvore(arvore->esquerda, arvore->informacao);
         }
       }
-    }
-  return arvore;;
-  
+        return arvore;
 }
 
 void mostrar_arvore(arvore *arvore) {
@@ -220,12 +212,10 @@ void mostrar_arvore(arvore *arvore) {
   }
 }
 
-void pre_ordem(arvore *arvore)
-{
+void pre_ordem(arvore *arvore) {
   // caso não exista a arvore
   if (arvore == NULL)
     return;
-
 
   if (arvore != NULL) {
     // peguei do professor que é uma função de retorno
@@ -237,17 +227,15 @@ void pre_ordem(arvore *arvore)
     mostrar_arvore(arvore->direita);
   }
 }
-void em_ordem(arvore *arvore)
-{
+void em_ordem(arvore *arvore) {
   // caso não exista a arvore
   if (arvore == NULL)
     return;
 
-
   if (arvore != NULL) {
     // peguei do professor que é uma função de retorno
     // em pré-ordem
-    // explicação dela : pega o mais a esquerda, raiz e depois 
+    // explicação dela : pega o mais a esquerda, raiz e depois
     // direita (ERD)
     mostrar_arvore(arvore->esquerda);
     printf("%d ", arvore->informacao);
@@ -255,13 +243,10 @@ void em_ordem(arvore *arvore)
   }
 }
 
-
-void pos_ordem(arvore *arvore)
-{
+void pos_ordem(arvore *arvore) {
   // caso não exista a arvore
   if (arvore == NULL)
     return;
-
 
   if (arvore != NULL) {
     // peguei do professor que é uma função de retorno
@@ -272,9 +257,6 @@ void pos_ordem(arvore *arvore)
     printf("%d ", arvore->informacao);
   }
 }
-
-
-
 
 int main(void) {
   struct Arvore *arvore = NULL;
@@ -323,37 +305,56 @@ int main(void) {
   // usando a mesma arvore de antes
   // testando valor duplicado
   printf("Teste 4:\n");
-  arvore = inserir_arvore(arvore, 9); 
-  mostrar_arvore(arvore);//esperado: 9, 8, 7, 12, 10, 9 , 11, 13
+  arvore = inserir_arvore(arvore, 9);
+  mostrar_arvore(arvore); // esperado: 9, 8, 7, 12, 10, 9 , 11, 13
   /*
       9
     8     12
   7     10   13
        9  11
-       
+
   */
   printf("\n\n");
 
-  
   // Daqui em diante sera um caso de teste para remover_arvore
-  // removendo nenhum filho existente 
+  // removendo nenhum filho existente
   printf("Teste 5:\n");
-  retirar_arvore(arvore,5);
+  retirar_arvore(arvore, 5);
+  printf("\nArvore atual:\n");
   mostrar_arvore(arvore); // esperado  o mesmo do teste 4
   printf("\n\n");
 
-  arvore = NULL;
-  
 
-  // removendo um filho 
+  // removendo um filho
   printf("Teste 6:\n");
   retirar_arvore(arvore, 7);
   mostrar_arvore(arvore); // esperado: 9, 8, 12, 10,11, 13
   printf("\n\n");
 
   arvore = NULL;
-  //ordenação de arvore
+  
+  // teste para retirar nó com dois filhos
   printf("Teste 7:\n");
+
+  arvore = inserir_arvore(arvore, 9);
+  arvore = inserir_arvore(arvore, 12);
+  arvore = inserir_arvore(arvore, 8);
+  arvore = inserir_arvore(arvore, 13);
+  arvore = inserir_arvore(arvore, 7);
+  arvore = inserir_arvore(arvore, 10);
+  /*
+      9
+    8     12
+  7     10   13
+  */
+  retirar_arvore(arvore, 12);
+  mostrar_arvore(arvore); // esperado: 9, 8, 7, 10, 13
+  printf("\n\n");
+
+  
+
+  arvore = NULL;
+
 
   arvore = inserir_arvore(arvore, 9);
   arvore = inserir_arvore(arvore, 12);
@@ -367,21 +368,19 @@ int main(void) {
       9
     8     12
   7     10   13
-         11
-
+          11
   */
   
   printf("Pre ordem: \n");
-  pre_ordem(arvore);// 9,8,7,12,10,11,13
+  pre_ordem(arvore); // 9,8,7,12,10,11,13
   printf("\n\n");
-  
+
   printf("Em ordem: \n");
   em_ordem(arvore); // 7,8,9,12,10,11,13
   printf("\n\n");
   printf("Pos ordem: \n");
   pos_ordem(arvore);
   printf("\n\n");
-  
 
   return 0;
 }
